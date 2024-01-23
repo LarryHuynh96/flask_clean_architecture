@@ -1,15 +1,18 @@
 # app/routes/language_routes.py
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, current_app
 from flask_restful import Api, Resource
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from app.adapters.language_adapter import LanguageAdapter
 from app.controllers.language_controller import LanguageController
 from app.use_cases.language_use_case import LanguageUseCase
+from app.log_handlers.log_handler import CustomLogger
+
 
 def language_blueprint(config_object):
     language_blueprint = Blueprint('language', __name__)
     api = Api(language_blueprint)
+    logger = CustomLogger().get_logger()
 
     class LanguageResource(Resource):
         def __init__(self):
@@ -24,6 +27,7 @@ def language_blueprint(config_object):
 
             try:
                 languages = self.language_controller.get_all_languages()
+                logger.info("Get all languages")
                 return languages
             except Exception as e:
                 print(f"Error retrieving languages: {e}")
